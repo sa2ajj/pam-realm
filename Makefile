@@ -9,3 +9,5 @@ pam_realm.so: pam_realm.o
 
 clean:
 	rm -f *.o *.so
+
+# $Id$

@@ -1,4 +1,9 @@
 //
+// Copyright (C) 2002, Mikhail Sobolev
+//
+// You may use, modify and redistribute this program according to the terms
+// and conditions of GPL v2
+//
 // Module: pam_realm
 //
 // Parameters:
@@ -6,6 +11,8 @@
 //      realm       -- realm to check against
 //      allowbare   -- allow user without @realm part
 //      nostrip     -- just check the realm, but do not strip it
+//
+// $Id$
 //
 
 #include <string.h>

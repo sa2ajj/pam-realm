@@ -1,0 +1,27 @@
+SUMMARY:
+
+  pam_realm:
+    Checks the user name against being of form <user>@<realm>, where <realm> is
+    supplied as an argument.  In case the check succeeds, this @<realm> part is
+    stripped, and the control is passed to the following module.
+
+OPTIONS:
+
+    debug           -- does not do anytning at the moment
+    realm=<realm>   -- specify the <realm> to check against
+    allowbare       -- also allows the user name to be of form just <user> without
+                       any @<realm>
+    nostrip         -- in certain cases, it may be of use to just check if the user
+                       name is of proper form
+
+BUGS:
+
+    Huh?
+
+AUTHOR:
+
+    Mikhail Sobolev <mss@mawhrin.net>
+
+REVISION:
+
+    $Id$

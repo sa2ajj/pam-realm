@@ -14,6 +14,11 @@ OPTIONS:
     nostrip         -- in certain cases, it may be of use to just check if the user
                        name is of proper form
 
+EXAMPLE:
+
+    auth    requisite   pam_realm.so    realm=mail.example.com
+    auth    require     pam_unix.so
+
 BUGS:
 
     Huh?
@@ -21,6 +26,13 @@ BUGS:
 AUTHOR:
 
     Mikhail Sobolev <mss@mawhrin.net>
+
+COPYRIGHT:
+
+    Copyright (C) 2000, Mikhail Sobolev
+
+    You may use, modify and redistribute this program according to the terms
+    and conditions of GPL v2
 
 REVISION:
 

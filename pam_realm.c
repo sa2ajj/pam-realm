@@ -21,126 +21,111 @@
 #include <security/pam_modules.h>
 #include <security/_pam_macros.h>
 
-enum
-{
+enum {
     PR_DEBUG = 1,
     PR_ALLOWBARE = 2,
     PR_NOSTRIP = 4,
 };
 
 static void
-_pam_log (int err, const char *format, ...)
-{
+_pam_log(int err, const char *format, ...) {
 	va_list args;
 
-	va_start (args, format);
-	vsyslog (LOG_AUTH | err, format, args);
-	va_end (args);
+	va_start(args, format);
+	vsyslog(LOG_AUTH | err, format, args);
+	va_end(args);
 }
 
 static int
-_pam_parse (int argc, const char **argv, char **realm)
-{
+_pam_parse(int argc, const char **argv, char **realm) {
     int ctrl = 0;
 
-    for (ctrl = 0; argc-- > 0; ++argv)
-    {
-        if (strcmp (*argv, "debug") == 0)
+    for (ctrl = 0; argc-- > 0; ++argv) {
+        if (strcmp(*argv, "debug") == 0)
             ctrl |= PR_DEBUG;
-        else if (strncmp (*argv, "realm=", 6) == 0)
-        {
-            *realm = x_strdup (*argv + 6);
+        else if (strncmp(*argv, "realm=", 6) == 0) {
+            *realm = x_strdup(*argv + 6);
             if (*realm == NULL)
-                _pam_log (LOG_CRIT, "failed to obtain realm");
-        }
-        else if (!strcmp (*argv, "allowbare"))
+                _pam_log(LOG_CRIT, "failed to obtain realm");
+        } else if (!strcmp(*argv, "allowbare"))
             ctrl |= PR_ALLOWBARE;
-        else if (!strcmp (*argv, "nostrip"))
+        else if (!strcmp(*argv, "nostrip"))
             ctrl |= PR_NOSTRIP;
         else
-            _pam_log (LOG_ERR, "pam_parse: unknown option; %s", *argv);
+            _pam_log(LOG_ERR, "pam_parse: unknown option; %s", *argv);
     }
 
     return ctrl;
 }
 
 PAM_EXTERN int
-pam_sm_authenticate (pam_handle_t * pamh, int flags, int argc, const char **argv)
-{
+pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     int retval, options;
     const char *user, *ptr;
     char *realm = NULL;
 
-    for (;;)
-    {
-        options = _pam_parse (argc, argv, &realm);
+    for (;;) {
+        options = _pam_parse(argc, argv, &realm);
 
-        if (realm == NULL)
-        {
-            _pam_log (LOG_ERR, "no realm is specified. aborted");
+        if (realm == NULL) {
+            _pam_log(LOG_ERR, "no realm is specified. aborted");
 
             retval = PAM_SERVICE_ERR;
 
             break;
         }
 
-        if ((retval = pam_get_user (pamh, &user, NULL)) != PAM_SUCCESS || user == NULL)
-        {
-            _pam_log (LOG_ERR, "no user specified");
+        if ((retval = pam_get_user(pamh, &user, NULL)) != PAM_SUCCESS || user == NULL) {
+            _pam_log(LOG_ERR, "no user specified");
 
             retval = PAM_USER_UNKNOWN;
             break;
         }
 
-        ptr = strchr (user, '@');
+        ptr = strchr(user, '@');
 
-        if (ptr == NULL)
-        {
-            if ((options & PR_ALLOWBARE) == 0)
-            {
-                _pam_log (LOG_ERR, "username does not contain @");
+        if (ptr == NULL) {
+            if ((options & PR_ALLOWBARE) == 0) {
+                _pam_log(LOG_ERR, "username does not contain @");
 
                 retval = PAM_USER_UNKNOWN;
-            }
-            else
+            } else {
                 retval = PAM_SUCCESS;
+            }
 
             break;
         }
 
         // from this point on, ptr is not NULL
 
-        if (strcasecmp (realm, ptr + 1) != 0)
-        {
-            _pam_log (LOG_ERR, "the realms do not match: %s != %s", realm, ptr + 1);
+        if (strcasecmp(realm, ptr + 1) != 0) {
+            _pam_log(LOG_ERR, "the realms do not match: %s != %s", realm, ptr + 1);
 
             retval = PAM_AUTH_ERR;
 
             break;
         }
 
-        if ((options & PR_NOSTRIP) == 0)
-        {
-            char *tempo = (char *)malloc (ptr - user + 1);
+        if ((options & PR_NOSTRIP) == 0) {
+            char *tempo = (char *)malloc(ptr - user + 1);
 
-            if (tempo == NULL)
-            {
+            if (tempo == NULL) {
                 retval = PAM_BUF_ERR;
 
-                _pam_log (LOG_ERR, "unable to create a temporary buffer");
+                _pam_log(LOG_ERR, "unable to create a temporary buffer");
 
                 break;
             }
 
-            memcpy (tempo, user, ptr - user);
+            memcpy(tempo, user, ptr - user);
             tempo[ptr - user] = '\0';
 
-            retval = pam_set_item (pamh, PAM_USER, tempo);
+            retval = pam_set_item(pamh, PAM_USER, tempo);
 
-            free (tempo);
-        }
-        else
+            free(tempo);
+        } else {
             retval = PAM_SUCCESS;
+        }
 
         break;
     }
@@ -149,8 +134,7 @@ pam_sm_authenticate (pam_handle_t * pamh, int flags, int argc, const char **argv
 }
 
 PAM_EXTERN int
-pam_sm_setcred (pam_handle_t * pamh, int flags, int argc, const char **argv)
-{
+pam_sm_setcred(pam_handle_t * pamh, int flags, int argc, const char **argv) {
     return PAM_IGNORE;
 }
 

@@ -12,8 +12,6 @@
 //      allowbare   -- allow user without @realm part
 //      nostrip     -- just check the realm, but do not strip it
 //
-// $Id$
-//
 
 #include <string.h>
 #include <stdarg.h>
